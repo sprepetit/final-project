@@ -1,0 +1,97 @@
+---
+title: "Final"
+author: "Sylvie Prepetit"
+format: html
+editor: visual
+execute:
+  Echo: false 
+---
+The data set consists of various variables including the company location, country of bean origin, cocoa percentage, ingredients, and rating. It is sourced from the \*\*Tidytuesday project\*\* and was specifically obtained from the 2022-01-18 dataset. We are particularly interested in exploring the distribution of ratings, performing a regression analysis, and summarizing key statistics.
+
+```{r, load-data, echo= FALSE}
+#Load libraries and data set 
+library(gtsummary)
+library(tidyverse)
+library(tidytuesdayR)
+library(dplyr)
+library(forcats)
+
+# Get the data?
+
+tuesdata <- tidytuesdayR::tt_load('2022-01-18')
+chocolate <- tuesdata$chocolate
+
+```
+
+```{r, group-data}
+#| echo: false
+#Grouping my categories of interest
+chocolate2 <- chocolate|>
+  mutate(company_location2 = fct_lump(company_location, n = 3),
+  			 bean_origin2 = fct_lump(country_of_bean_origin, n = 5),
+  			 cocoa_pct2 = fct_lump(cocoa_percent, n = 5),
+				 ingredients2 = fct_lump(ingredients, n = 3)
+	)
+
+# Ensure the 'data' directory exists
+dir.create(here::here("data"), showWarnings = FALSE, recursive = TRUE)
+
+# Save the grouped data to a CSV file
+write_csv(chocolate2, here::here("data", "chocolate_grouped.csv"))
+
+```
+
+```{r, creating-table}
+#| label: tbl-one
+#| tbl-cap: "This is a table"
+  tbl_summary(
+  	chocolate2,
+  	by=company_location2,
+  	include = c( bean_origin2, cocoa_pct2, ingredients2),
+  	missing_text = "missing")  |>
+
+  	add_overall()|>
+    bold_labels()
+```
+@tbl-one contains a table
+```{r, regression-model}
+    tbl_uvregression(
+  	chocolate2,
+  	y = rating,
+  	include = c(bean_origin2, cocoa_pct2,ingredients2),
+  	method = glm,
+  	method.args=list(family = gaussian()))
+ 
+```
+
+```{r, hist}
+#| label: fig-hist
+#| fig-cap: "This is a histogram"
+hist(chocolate2$rating)
+ggsave(here::here("figure","fig.hist.png"))
+```
+
+```{r, create-function}
+ new_mean <- function(x) {
+	n <- length(x)
+	mean_val <- sum(x) / n
+	return(mean_val)
+ }
+
+ new_mean(chocolate2$rating)
+
+ # function for standard deviation 
+ new_sd <- function(x) {
+ 	n <- length(x)
+ 	mean_val <- sum(x) / n
+ 	squared_diff <- (x - mean_val)^2
+ 	variance <- sum(squared_diff) / (n - 1)
+ 	sd_val <- sqrt(variance)
+ 	return(sd_val)
+ }
+
+ new_sd(chocolate2$rating)
+```
+
+
+The standard deviation for the chocolate ratings is `r new_sd(chocolate2$rating)`

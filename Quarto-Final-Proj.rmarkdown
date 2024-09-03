@@ -1,0 +1,85 @@
+---
+title: "Final Project"
+author: "Sylvie Prepetit"
+format: html
+editor: visual
+---
+
+```{r}
+#load data set 
+library(gtsummary)
+library(tidyverse)
+here::here ()
+library(tidytuesdayR)
+library(dplyr)
+library(forcats)
+
+# Get the data 
+
+tuesdata <- tidytuesdayR::tt_load('2022-01-18')
+chocolate <- tuesdata$chocolate
+
+```
+
+```{r}
+#grouping my categories of interest
+
+chocolate2 <- chocolate|>
+  mutate(company_location2 = fct_lump(company_location, n = 3),
+  			 bean_origin2 = fct_lump(country_of_bean_origin, n = 5),
+  			 cocoa_pct2 = fct_lump(cocoa_percent, n = 5),
+				 ingredients2 = fct_lump(ingredients, n = 3)
+	)
+```
+
+```{r}
+#1 making my table (gt summary table)
+  tbl_summary(
+  	chocolate2,
+  	by=company_location2,
+  	include = c( bean_origin2, cocoa_pct2, ingredients2),
+  	missing_text = "missing")  |>
+
+  	add_overall()|>
+    bold_labels()
+```
+
+```{r}
+# 2 Fit a regression and present well-formatted results from the regression
+  tbl_uvregression(
+  	chocolate2,
+  	y = rating,
+  	include = c(bean_origin2, cocoa_pct2,ingredients2),
+  	method = glm,
+  	method.args=list(family = gaussian()))
+ 
+```
+
+```{r}
+# 3 Create a figure
+hist(chocolate2$rating)
+```
+
+```{r}
+# 4 Write and use a function that does something with the data
+ new_mean <- function(x) {
+	n <- length(x)
+	mean_val <- sum(x) / n
+	return(mean_val)
+ }
+
+ new_mean(chocolate2$rating)
+
+ # function for standard deviation ???
+ new_sd <- function(x) {
+ 	n <- length(x)
+ 	mean_val <- sum(x) / n
+ 	squared_diff <- (x - mean_val)^2
+ 	variance <- sum(squared_diff) / (n - 1)
+ 	sd_val <- sqrt(variance)
+ 	return(sd_val)
+ }
+
+ new_sd(chocolate2$rating)
+```
+
