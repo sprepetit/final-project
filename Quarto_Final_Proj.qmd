@@ -6,7 +6,7 @@ editor: visual
 execute:
   Echo: false 
 ---
-The data set consists of various variables including the company location, country of bean origin, cocoa percentage, ingredients, and rating. It is sourced from the \*\*Tidytuesday project\*\* and was specifically obtained from the 2022-01-18 dataset. We are particularly interested in exploring the distribution of ratings, performing a regression analysis, and summarizing key statistics.
+The data set consists of various variables including the company location, country of bean origin, cocoa percentage, ingredients, and rating. It is sourced from the \*\*Tidytuesday project\*\* and was specifically obtained from the 2022-01-18 dataset. I am exploring the distribution of ratings, performing a regression analysis, and summarizing key statistics.
 
 ```{r, load-data, echo= FALSE}
 #Load libraries and data set 
@@ -70,7 +70,7 @@ write_csv(chocolate2, here::here("data", "chocolate_grouped.csv"))
 hist(chocolate2$rating)
 ggsave(here::here("figure","fig.hist.png"))
 ```
-
+@fig-one contains a figure 
 ```{r, create-function}
  new_mean <- function(x) {
 	n <- length(x)
